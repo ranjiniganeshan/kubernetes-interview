@@ -19,14 +19,18 @@ $ ./get_helm.sh
 
 ## Monitoring kubenetes cluster 
 
-ranjiniganeshan@Ranjinis-MacBook-Pro kubernetes-interview %  kubectl create namespace prometheus
-
+ranjiniganeshan@Ranjinis-MacBook-Pro kubernetes-interview %  
+```
+kubectl create namespace prometheus
+```
 namespace/prometheus created
 
+```
 helm upgrade -i prometheus prometheus-community/prometheus \
   --namespace prometheus \
   --set alertmanager.persistentVolume.storageClass="gp2" \
   --set server.persistentVolume.storageClass="gp2"
+```
 
 Release "prometheus" does not exist. Installing it now.
 NAME: prometheus
@@ -77,6 +81,7 @@ Get the PushGateway URL by running these commands in the same shell:
 
 For more information on running Prometheus, visit:
 https://prometheus.io/
+```
 
 export cluster_name="demo-cluster"
 
@@ -87,7 +92,7 @@ export cluster_name="demo-cluster"
   --role-name AmazonEKS_EBS_CSI_DriverRole \
   --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
   --approve --role-only
-
+```
 2024-10-18 16:33:02 [ℹ]  1 iamserviceaccount (kube-system/ebs-csi-controller-sa) was included (based on the include/exclude rules)
 2024-10-18 16:33:02 [!]  serviceaccounts in Kubernetes will not be created or modified, since the option --role-only is used
 2024-10-18 16:33:02 [ℹ]  1 task: { create IAM role for serviceaccount "kube-system/ebs-csi-controller-sa" }
@@ -96,16 +101,18 @@ export cluster_name="demo-cluster"
 2024-10-18 16:33:03 [ℹ]  waiting for CloudFormation stack "eksctl-demo-cluster-addon-iamserviceaccount-kube-system-ebs-csi-controller-sa"
 2024-10-18 16:33:35 [ℹ]  waiting for CloudFormation stack "eksctl-demo-cluster-addon-iamserviceaccount-kube-system-ebs-csi-controller-sa"
 
-
+```
 eksctl create addon --name aws-ebs-csi-driver --cluster $cluster_name --service-account-role-arn arn:aws:iam::909293070315:role/AmazonEKS_EBS_CSI_DriverRole --force
 
 eksctl create addon --name aws-ebs-csi-driver --cluster $cluster_name --service-account-role-arn arn:aws:iam::909293070315:role/AmazonEKS_EBS_CSI_DriverRole --force
+```
 2024-10-18 16:41:51 [ℹ]  Kubernetes version "1.27" in use by cluster "demo-cluster"
 2024-10-18 16:41:52 [ℹ]  using provided ServiceAccountRoleARN "arn:aws:iam::909293070315:role/AmazonEKS_EBS_CSI_DriverRole"
 2024-10-18 16:41:52 [ℹ]  creating addon
 
+```
 kubectl get pvc,pods -n prometheus
-
+```
 NAME                                                      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 persistentvolumeclaim/prometheus-server                   Bound    pvc-2d10600c-7a3e-4474-985f-882072c2b7fa   8Gi        RWO            gp2            81s
 persistentvolumeclaim/storage-prometheus-alertmanager-0   Bound    pvc-7e44aa9a-1815-4d3f-9bb5-5a31f280c960   2Gi        RWO            gp2            6m49s
@@ -122,14 +129,13 @@ pod/prometheus-server-64589ccb46-66m2r                  2/2     Running   0     
 
 
 
-
-
-
+```
 kubectl label pod prometheus-server-64589ccb46-66m2r app=prometheus -n prometheus
+```
 pod/prometheus-server-64589ccb46-66m2r labeled
-
+```
 kubectl apply -f prometheus-service.yaml 
-
+```
 service/prometheus-nodeport created
 
 * Access prometheus using any worker node IP external IP and nodeport
@@ -154,19 +160,24 @@ If you don't see a command prompt, try pressing enter.
 
 # grafana install
 
+```
 helm install grafana grafana/grafana \
 --namespace grafana \
 --set persistence.enabled=true \
 --set persistence.storageClassName="gp2" \
 --set adminPassword='EKS!sAWSome' \
 --set service.type=NodePort
-
+```
+```
 helm install grafana grafana/grafana \
 >   --namespace grafana \
 >   --set persistence.enabled=true \
 >   --set persistence.storageClassName="gp2" \
 >   --set adminPassword='EKS!sAWSome' \
 >   --set service.type=NodePort
+
+```
+
 NAME: grafana
 LAST DEPLOYED: Fri Oct 18 17:33:21 2024
 NAMESPACE: grafana
@@ -200,3 +211,6 @@ ip-192-168-81-172.us-west-2.compute.internal   Ready    <none>   52m   v1.27.16-
 ip-192-168-82-7.us-west-2.compute.internal     Ready    <none>   52m   v1.27.16-eks-a737599   192.168.82.7     52.24.135.97    Amazon Linux 2   5.10.226-214.879.amzn2.x86_64   containerd://1.7.22
 ip-192-168-85-152.us-west-2.compute.internal   Ready    <none>   52m   v1.27.16-eks-a737599   192.168.85.152   54.190.114.47   Amazon Linux 2   5.10.226-214.879.amzn2.x86_64   containerd://1.7.22
 ranjiniganeshan@Ranjinis-MacBook-Pro kubernetes-interview % 
+
+
+Access grafana from http://external-ip:nodeport
